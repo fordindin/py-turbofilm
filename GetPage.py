@@ -11,13 +11,13 @@ from TurboAuth import PassportAuth
 p = PassportAuth()
 login = "dindin@dindin.ru"
 
-def auth(login, password):
+def auth(login):
 	if not p.check_ssid():
 			p.get_cookies(login, getpass.getpass("password for %s:" % login))
 
 def getpage(url, data={}, headers={}):
 	data = urllib.urlencode(data)
-	auth(login, password)
+	auth(login)
 	req = urllib2.urlopen(url)
 	req = urllib2.Request(url, data, headers)
 	response = urllib2.urlopen(req)
