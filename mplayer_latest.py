@@ -25,4 +25,6 @@ args = [
 		latest]
 args.extend(sys.argv[1:])
 
-Popen(args)
+p = Popen(args)
+pid, sts = os.waitpid(p.pid, 0)
+print pid, sts
