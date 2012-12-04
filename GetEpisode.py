@@ -11,6 +11,7 @@ from xml2srt import fetch_sub
 import os
 import re
 import sys
+import json
 from subprocess import Popen, PIPE, STDOUT
 
 wrkdir = "/Users/dindin/tmp/turbofilm"
@@ -55,6 +56,10 @@ if not os.path.exists(s_dir):
 		os.mkdir(s_dir)
 
 metadata = xml2obj.xml2obj(xml_metadata)
+metadata["fetched_quality"] = quality
+fd = open(dir_name+".meta", "w")
+fd.write(json.dumps(metadata))
+fd.close()
 try:
 		print "Got metadata" # metadata
 		fetch_sub(metadata["subtitles"]["sources"]["en"], dir_name+".srt")
