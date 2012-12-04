@@ -73,4 +73,5 @@ else:
 				del(metadata["lastpos"])
 				fd.write(json.dumps(metadata))
 				remoteMeta.watchEpisode(metadata["eid"])
+fd.truncate()
 fd.close()
