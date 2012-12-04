@@ -63,7 +63,7 @@ for l in tmp.readlines():
 						quit_position = match.groups()
 
 tmp.close()
-fd = open(os.path.splitext(latest)[0]+'.meta', "w")
+fd = open(os.path.splitext(latest)[0]+'.meta', "w+")
 print float(quit_position[0])/float(metadata["duration"])
 if float(quit_position[0])/float(metadata["duration"]) < 0.98:
 				metadata["lastpos"]=float(quit_position[0]) - 5
@@ -71,7 +71,7 @@ if float(quit_position[0])/float(metadata["duration"]) < 0.98:
 else:
 		if metadata.has_key("lastpos"):
 				del(metadata["lastpos"])
-				fd.write(json.dumps(metadata))
-				remoteMeta.watchEpisode(metadata["eid"])
-fd.truncate()
+		fd.write(json.dumps(metadata))
+		print remoteMeta.watchEpisode(metadata["eid"])
+#fd.truncate()
 fd.close()

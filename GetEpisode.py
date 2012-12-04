@@ -13,18 +13,19 @@ import re
 import sys
 import json
 from subprocess import Popen, PIPE, STDOUT
-from lastunseen import lastunseen
+from lastunseen import lastunseen, listunseen
 
 wrkdir = "/Users/dindin/tmp/turbofilm"
 maxretry = 5
 
 def usage(selfname):
 		print """Usage:
+\t%s unseen
 \t%s [-lq]  http://turbofilm.tv/Path/To/Episode
 \t\tor
 \t%s [-lq] SeriesName
 \t\tor
-\t%s [-lq] SeriesName SeasonNumber EpisodeNumber\n""" % tuple([os.path.basename(selfname)]*3)
+\t%s [-lq] SeriesName SeasonNumber EpisodeNumber\n""" % tuple([os.path.basename(selfname)]*4)
 		sys.exit(1)
 
 class MyHTMLParser(HTMLParser):
@@ -40,6 +41,9 @@ argv = sys.argv
 if "-lq" in argv:
 		quality = "default"
 		argv.pop(argv.index("-lq"))
+if sys.argv[1] == 'unseen':
+		print listunseen()
+		sys.exit(0)
 
 get_lastunseen=False
 if len(argv) == 2:
