@@ -13,9 +13,19 @@ import re
 import sys
 import json
 from subprocess import Popen, PIPE, STDOUT
+from lastunseen import lastunseen
 
 wrkdir = "/Users/dindin/tmp/turbofilm"
 maxretry = 5
+
+def usage(selfname):
+		print """Usage:
+\t%s [-lq]  http://turbofilm.tv/Path/To/Episode
+\t\tor
+\t%s [-lq] SeriesName
+\t\tor
+\t%s [-lq] SeriesName SeasonNumber EpisodeNumber\n""" % tuple([os.path.basename(selfname)]*3)
+		sys.exit(1)
 
 class MyHTMLParser(HTMLParser):
 		metadata=None
@@ -31,15 +41,27 @@ if "-lq" in argv:
 		quality = "default"
 		argv.pop(argv.index("-lq"))
 
-series_data = re.match("http://turbofilm.tv/Watch/(.*)/Season(.*)/Episode(.*)",sys.argv[1])
-if series_data:
+get_lastunseen=False
+if len(argv) == 2:
+		series_data = re.match("http://turbofilm.tv/Watch/(.*)/Season(.*)/Episode(.*)",sys.argv[1])
+		if series_data:
+				t_name, season, number = series_data.groups()
+		else:
+				get_lastunseen=True
+				selfname, t_name = argv
+elif len(argv) == 4:
+		selfname, t_name, season, number = argv
+else: usage(sys.argv[0])
+
+if get_lastunseen:
+		url = lastunseen(t_name)
+		series_data = re.match("http://turbofilm.tv/Watch/(.*)/Season(.*)/Episode(.*)",url)
 		t_name, season, number = series_data.groups()
 else:
-		selfname, t_name, season, number = argv
-
-
-url = "http://turbofilm.tv/Watch/%s/Season%s/Episode%s" % (t_name, season,
+		url = "http://turbofilm.tv/Watch/%s/Season%s/Episode%s" % (t_name, season,
 				number)
+		
+
 s_dir = os.path.join(wrkdir, t_name)
 fname_base = "S%02dE%02d" % (int(season), int(number))
 
