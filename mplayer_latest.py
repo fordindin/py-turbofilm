@@ -1,8 +1,17 @@
 #!/usr/bin/env python
 
 import os
+import re
 import sys
+import tempfile
+import subprocess
+import json
 from subprocess import Popen
+
+selfpath = os.path.realpath(sys.argv[0])
+selfdir = os.path.dirname(selfpath)
+sys.path.append(selfdir)
+import remoteMeta
 
 ctime = []
 def wfunction(*argv):
@@ -20,7 +29,15 @@ def sort_cmp(a,b):
 
 ctime.sort(cmp=sort_cmp)
 latest = ctime[-1][0]
-srt = os.path.splitext(latest)[0]+('.srt')
+srt = os.path.splitext(latest)[0]+'.srt'
+
+fd = open(os.path.splitext(latest)[0]+'.meta')
+metadata = json.load(fd)
+fd.close()
+# neat trick to duplicate stdout content to tempfile
+#sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
+#os.dup2(tee.stdin.fileno(), sys.stdout.fileno())
+#os.dup2(tee.stdin.fileno(), sys.stderr.fileno())
 
 args = [
 		"mplayer",
@@ -29,7 +46,31 @@ args = [
 		srt
 		]
 args.extend(sys.argv[1:])
+if metadata.has_key("lastpos"):
+		args.extend(["-ss", str(metadata["lastpos"])])
 
-p = Popen(args)
+tmp = tempfile.NamedTemporaryFile()
+tee = subprocess.Popen(["tee", tmp.name], stdin=subprocess.PIPE)
+p = Popen(args, stdout=tee.stdin)
 pid, sts = os.waitpid(p.pid, 0)
-print pid, sts
+tmp.flush()
+tee.stdin.flush()
+tmp.seek(0)
+for l in tmp.readlines():
+		if len(l.split(u'\033[J\r')) > 1:
+				match = re.match("A:\s*[0-9.]*\s*V:\s*([0-9.]*)\s*A-V:", l.split(u'\033[J\r')[-2])
+				if match:
+						quit_position = match.groups()
+
+tmp.close()
+fd = open(os.path.splitext(latest)[0]+'.meta', "w")
+print float(quit_position[0])/float(metadata["duration"])
+if float(quit_position[0])/float(metadata["duration"]) < 0.98:
+				metadata["lastpos"]=float(quit_position[0]) - 5
+				fd.write(json.dumps(metadata))
+else:
+		if metadata.has_key("lastpos"):
+				del(metadata["lastpos"])
+				fd.write(json.dumps(metadata))
+				remoteMeta.watchEpisode(metadata["eid"])
+fd.close()
