@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import urllib, urllib2, cookielib
+import urllib, urllib2, cookielib, getpass
 #from xml.etree.ElementTree import ElementTree
 #import StringIO
 #import xml.dom.minidom
