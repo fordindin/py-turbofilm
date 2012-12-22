@@ -12,6 +12,7 @@ selfpath = os.path.realpath(sys.argv[0])
 selfdir = os.path.dirname(selfpath)
 sys.path.append(selfdir)
 import remoteMeta
+from GetEpisode import wrkdir
 
 ctime = []
 def wfunction(*argv):
@@ -20,7 +21,7 @@ def wfunction(*argv):
 				if os.path.splitext(f)[1] != '.mp4': continue
 				fpath=os.path.join(argv[1],f)
 				ctime.append((fpath,os.stat(fpath).st_ctime))
-os.path.walk("/Users/dindin/tmp/turbofilm", wfunction, None)
+os.path.walk(wrkdir, wfunction, None)
 
 def sort_cmp(a,b):
 		if a[1] > b[1]: return 1
