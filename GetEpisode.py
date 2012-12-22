@@ -15,7 +15,7 @@ from subprocess import Popen, PIPE, STDOUT
 from lastunseen import lastunseen, listunseen
 from random import Random
 
-wrkdir = "/Users/dindin/tmp/turbofilm"
+wrkdir = "%s/turbofilm" % os.getenv("HOME")
 maxretry = 5
 
 def usage(selfname):
