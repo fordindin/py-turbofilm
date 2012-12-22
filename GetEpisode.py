@@ -16,7 +16,7 @@ from lastunseen import lastunseen, listunseen
 from random import Random
 
 wrkdir = "%s/turbofilm" % os.getenv("HOME")
-if not os.isdir(wrkdir): os.mkdir(wrkdir)
+if not os.path.isdir(wrkdir): os.mkdir(wrkdir)
 maxretry = 5
 
 def usage(selfname):
