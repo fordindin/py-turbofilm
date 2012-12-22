@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import GetPage
-from xml.dom.minidom import parseString
 from HTMLParser import HTMLParser
 from urllib2 import unquote
 from wierd_b64_decode import w_base64_decode as wb64
@@ -14,6 +13,7 @@ import sys
 import json
 from subprocess import Popen, PIPE, STDOUT
 from lastunseen import lastunseen, listunseen
+from random import Random
 
 wrkdir = "/Users/dindin/tmp/turbofilm"
 maxretry = 5
@@ -46,6 +46,13 @@ if sys.argv[1] == 'unseen':
 		sys.exit(0)
 
 get_lastunseen=False
+
+if sys.argv[1] == 'runseen':
+		tr = filter(lambda a: a[0]==3, listunseen(retlist=True))
+		r = Random()
+		get_lastunseen=True
+		t_name = r.choice(tr)[1]
+
 if len(argv) == 2:
 		series_data = re.match("http://turbofilm.tv/Watch/(.*)/Season(.*)/Episode(.*)",sys.argv[1])
 		if series_data:

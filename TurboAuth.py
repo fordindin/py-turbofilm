@@ -7,7 +7,7 @@ import urllib, urllib2, cookielib
 #import xml.dom.minidom
 import os, re, time
 
-""" This module emulates Yandex.Passport auth.
+""" This module emulates Turbofilm.tv auth.
 It checks cookies in given cookie jar, and put there
 valid cookies in case of expiration"""
 

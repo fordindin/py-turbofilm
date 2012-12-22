@@ -26,7 +26,7 @@ def lastunseen(seriesName):
 			if re.match('.*\/%s\/.*' % seriesName, u):
 					return 'http://turbofilm.tv' + u
 
-def listunseen():
+def listunseen(retlist=False):
 	unseen = {}
 	unseen_list = []
 	retstr = ""
@@ -45,9 +45,16 @@ def listunseen():
 					elif a[0] < b[0]: return -1
 					else: return 0
 			unseen_list.sort(cmp=comp)
+	if retlist: return unseen_list
 	for e in unseen_list:
 			if e[0] == 3: 
 					prefix = ">="
 			else: prefix = "=="
 			retstr+=prefix+" %d\t%s\n" % e
 	return retstr
+
+if __name__ == '__main__':
+		pass
+#		page = re.sub('&(?![a-z]*;)', '&amp;',
+#						GetPage.getpage('http://turbofilm.tv/My/Series')["page"])
+
