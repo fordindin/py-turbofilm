@@ -107,7 +107,7 @@ trycount = 0
 while sts != 0:
 		print "Try number %d" % trycount
 		p = Popen(
-						["/opt/local/bin/wget",
+						["wget",
 				"-c", "-O", dir_name+".mp4",
 				cdn_url(iasid,
 						metadata["eid"],
