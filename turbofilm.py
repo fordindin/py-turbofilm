@@ -11,12 +11,22 @@ import os
 import re
 import sys
 import json
-from subprocess import Popen, PIPE, STDOUT
+from subprocess import Popen, PIPE
 from lastunseen import lastunseen, listunseen
 from random import Random
+import threading
+import time
+import Queue
+import turboplay
+from fetcher import fetcher
+
+#selfpath = os.path.realpath(sys.argv[0])
+#selfdir = os.path.dirname(selfpath)
+#sys.path.append(selfdir)
+
 
 wrkdir = "%s/turbofilm" % os.getenv("HOME")
-maxretry = 5
+turboplay.wrkdir = wrkdir
 
 def usage(selfname):
 		print """Usage:
@@ -39,12 +49,20 @@ class MyHTMLParser(HTMLParser):
 def main(argv):
 		if not os.path.isdir(wrkdir): os.mkdir(wrkdir)
 		quality="hq"
+		play=False
 		if "-lq" in argv:
 				quality = "default"
 				argv.pop(argv.index("-lq"))
 		if argv[1] == 'unseen':
 				print listunseen()
 				sys.exit(0)
+		if "play" in argv:
+				play=True
+				playindex=argv.index("play")
+				playargs=[]
+				for i in range(playindex, len(argv)):
+						playargs.append(argv.pop(playindex))
+				playargs.pop(0)
 
 		get_lastunseen=False
 
@@ -101,26 +119,23 @@ def main(argv):
 		except KeyError:
 				print "Subtitles not found"
 
-		sts = 1
-		trycount = 0
 
-		while sts != 0:
-				print "Try number %d" % trycount
-				p = Popen(
-								["wget",
-						"-c", "-O", dir_name+".mp4",
-						cdn_url(iasid,
-								metadata["eid"],
-								metadata["sources2"][quality],
-								0,
-								"en")
-						],
-				)
-				#retcode = os.execv(
-				#		)["subtitles"]["sources"]["en"
-				pid, sts = os.waitpid(p.pid, 0)
-				trycount += 1
-				if trycount > maxretry: break
+		if play:
+				pos = 0
+				queue = Queue.Queue()
+				fetch_th = threading.Thread(target=fetcher, args=(metadata, iasid, dir_name, quality),
+						kwargs={"silent":True})
+				fetch_th.start()
+				time.sleep(5)
+				while float(pos)/float(metadata["duration"]) < 0.98 and fetch_th.isAlive():
+						play_th = threading.Thread(target=turboplay.mplay, args=(playargs,),
+								kwargs={"queue":queue})
+						play_th.start()
+						play_th.join()
+						if not queue.empty():
+								pos = queue.get()
+		else:
+				fetcher(metadata, iasid, dir_name, quality)
 
 
 if __name__ == "__main__":

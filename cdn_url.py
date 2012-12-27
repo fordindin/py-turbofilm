@@ -4,7 +4,7 @@ from hashlib import sha1
 from random import random
 
 def cdn_url(iasid, eid, current_source, offset, lang):
-		print lang, offset, current_source
+		#print lang, offset, current_source
 		rseed = sha1(iasid + str(random())).hexdigest()
 		skey = sha1(rseed + eid + "A2DC51DE0F8BC1E9").hexdigest()
 		return "http://cdn.turbofilm.tv/"+ sha1(lang).hexdigest() + "/" + \
