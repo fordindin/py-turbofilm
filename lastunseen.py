@@ -3,6 +3,7 @@
 import GetPage
 from HTMLParser import HTMLParser
 import re
+import config
 
 class MyHTMLParser(HTMLParser):
 		tstack = []
@@ -31,18 +32,18 @@ class MyHTMLParser(HTMLParser):
 
 def lastunseen(seriesName):
 	parser = MyHTMLParser()
-	page = GetPage.getpage('http://turbofilm.tv/My/Series')["page"]
+	page = GetPage.getpage(config.series_page)["page"]
 	parser.feed(page)
 	for u in parser.get_unseen():
 			if re.match('.*\/%s\/.*' % seriesName, u):
-					return 'http://turbofilm.tv' + u
+					return config.turbofilm_base + u
 
 def listunseen(retlist=False):
 	unseen = {}
 	unseen_list = []
 	retstr = "\n"
 	parser = MyHTMLParser()
-	page = GetPage.getpage('http://turbofilm.tv/My/Series')["page"]
+	page = GetPage.getpage(config.series_page)["page"]
 	parser.feed(page)
 	for u in parser.get_unseen():
 			series = re.match('/Watch/(.*)/Season', u).groups()[0]
@@ -67,6 +68,4 @@ def listunseen(retlist=False):
 
 if __name__ == '__main__':
 		pass
-#		page = re.sub('&(?![a-z]*;)', '&amp;',
-#						GetPage.getpage('http://turbofilm.tv/My/Series')["page"])
 

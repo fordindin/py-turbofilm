@@ -7,38 +7,35 @@ import tempfile
 import subprocess
 import json
 from subprocess import Popen
-
-#selfpath = os.path.realpath(sys.argv[0])
-#selfdir = os.path.dirname(selfpath)
-#if not selfdir in sys.path: sys.path.append(selfdir)
 import remoteMeta
 if __name__ == "__main__": from turbofilm import wrkdir
 
-def mplay(argv, queue=None):
-		ctime = []
-		def wfunction(*argv):
-				for f in argv[2]:
-						if os.path.isdir(f): continue
-						if os.path.splitext(f)[1] != '.mp4': continue
-						fpath=os.path.join(argv[1],f)
-						ctime.append((fpath,os.stat(fpath).st_ctime))
-
-		def sort_cmp(a,b):
-				if a[1] > b[1]: return 1
-				elif a[1] == b[1]: return 0
-				else: return -1
-		os.path.walk(wrkdir, wfunction, None)
-		ctime.sort(cmp=sort_cmp)
-		latest = ctime[-1][0]
-		srt = os.path.splitext(latest)[0]+'.srt'
-
-		fd = open(os.path.splitext(latest)[0]+'.meta')
+def load_saved_meta(fpath):
+		fd = open(fpath)
 		metadata = json.load(fd)
 		fd.close()
-		# neat trick to duplicate stdout content to tempfile
-		#sys.stdout = os.fdopen(sys.stdout.fileno(), 'w', 0)
-		#os.dup2(tee.stdin.fileno(), sys.stdout.fileno())
-		#os.dup2(tee.stdin.fileno(), sys.stderr.fileno())
+		return metadata
+
+def mplay(argv, latest=None, queue=None):
+		if not latest:
+				ctime = []
+				def wfunction(*argv):
+						for f in argv[2]:
+								if os.path.isdir(f): continue
+								if os.path.splitext(f)[1] != '.mp4': continue
+								fpath=os.path.join(argv[1],f)
+								ctime.append((fpath,os.stat(fpath).st_ctime))
+
+				def sort_cmp(a,b):
+						if a[1] > b[1]: return 1
+						elif a[1] == b[1]: return 0
+						else: return -1
+				os.path.walk(wrkdir, wfunction, None)
+				ctime.sort(cmp=sort_cmp)
+				latest = ctime[-1][0]
+		srt = os.path.splitext(latest)[0]+'.srt'
+
+		metadata = load_saved_meta(os.path.splitext(latest)[0]+'.meta')
 
 		args = [
 				"mplayer",
@@ -65,17 +62,17 @@ def mplay(argv, queue=None):
 								quit_position = match.groups()
 
 		tmp.close()
+
 		fd = open(os.path.splitext(latest)[0]+'.meta', "w+")
-		if float(quit_position[0])/float(metadata["duration"]) < 0.98:
-						metadata["lastpos"]=float(quit_position[0]) - 5
-						fd.write(json.dumps(metadata))
-		else:
-				if metadata.has_key("lastpos"):
-						del(metadata["lastpos"])
-				fd.write(json.dumps(metadata))
-				print remoteMeta.watchEpisode(metadata["eid"])
-		#fd.truncate()
+		metadata["lastpos"]=float(quit_position[0]) - 5
+		fd.write(json.dumps(metadata))
 		fd.close()
+
+
+		if float(quit_position[0])/float(metadata["duration"]) > 0.98:
+				response = remoteMeta.watchEpisode(metadata["eid"])
+				print response
+				if response == {'page': ''}: print '\n\nEpisode has been watched'
 		if queue: queue.put(float(quit_position[0]))
 		else: return float(quit_position[0])
 

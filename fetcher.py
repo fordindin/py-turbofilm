@@ -4,56 +4,39 @@ from subprocess import Popen, PIPE
 import sys
 import os
 from cdn_url import cdn_url
-
-maxretry = 5
+import config
 
 def fetcher(metadata, iasid, dir_name, quality,  silent=False):
 		sts = 1
 		trycount = 0
 		while sts != 0:
-				if silent:
-						stdout=PIPE
-						stdin=None
-						stderr=PIPE
-						close_fds=True
-				else:
-						stdout=sys.stdout
-						stdin=sys.stdin
-						stderr=sys.stderr
-						close_fds=False
-						print "Try number %d" % trycount
+				print "Try number %d" % trycount
 
-				#retcode = os.execv(
-				#		)["subtitles"]["sources"]["en"
+				wget_args = [
+								"wget",
+								"-c", "-O", dir_name+".mp4",
+								"--no-check-certificate",
+								cdn_url(iasid,
+										metadata["eid"],
+										metadata["sources2"][quality],
+										0,
+										"en")
+								]
+
+				kwargs = { }
+
 				if silent:
-						p = Popen(
-										["wget",
-								"-c", "-O", dir_name+".mp4",
-								cdn_url(iasid,
-										metadata["eid"],
-										metadata["sources2"][quality],
-										0,
-										"en")
-								],
-								stdout=stdout,
-								stdin=stdin,
-								stderr=stderr,
-								close_fds=close_fds,
-						)
-						#p.communicate()
-						pid, sts = os.waitpid(p.pid, 0)
-						#p.wait()
-				else:
-						p = Popen(
-										["wget",
-								"-c", "-O", dir_name+".mp4",
-								cdn_url(iasid,
-										metadata["eid"],
-										metadata["sources2"][quality],
-										0,
-										"en")
-								],
-						)
-						pid, sts = os.waitpid(p.pid, 0)
+						kwargs.update({
+								"stdout" : PIPE,
+								"stdin" : None,
+								"stderr" : PIPE,
+								"close_fds" : True,
+								})
+
+				print wget_args
+				p = Popen( wget_args, **kwargs )
+				pid, sts = os.waitpid(p.pid, 0)
+
 				trycount += 1
-				if trycount > maxretry: break
+				if trycount > config.max_fetch_retry: break
+		os.utime(dir_name+".mp4", None)
