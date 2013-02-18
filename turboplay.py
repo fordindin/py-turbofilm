@@ -32,7 +32,11 @@ def mplay(argv, latest=None, queue=None):
 						else: return -1
 				os.path.walk(wrkdir, wfunction, None)
 				ctime.sort(cmp=sort_cmp)
-				latest = ctime[-1][0]
+				try:
+						latest = ctime[-1][0]
+				except IndexError:
+						print "There is no fetched episodes"
+						sys.exit(1)
 		srt = os.path.splitext(latest)[0]+'.srt'
 
 		metadata = load_saved_meta(os.path.splitext(latest)[0]+'.meta')
@@ -72,7 +76,11 @@ def mplay(argv, latest=None, queue=None):
 		if float(quit_position[0])/float(metadata["duration"]) > 0.98:
 				response = remoteMeta.watchEpisode(metadata["eid"])
 				print response
-				if response == {'page': ''}: print '\n\nEpisode has been watched'
+				if response == {'page': ''}:
+						print '\n\nEpisode has been watched'
+						print 'Cleanup...'
+						for e in ('.meta','.mp4', '.srt'):
+								os.remove(os.path.splitext(latest)[0]+e)
 		if queue: queue.put(float(quit_position[0]))
 		else: return float(quit_position[0])
 
