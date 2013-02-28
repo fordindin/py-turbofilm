@@ -79,8 +79,10 @@ def mplay(argv, latest=None, queue=None):
 				if response == {'page': ''}:
 						print '\n\nEpisode has been watched'
 						print 'Cleanup...'
-						for e in ('.meta','.mp4', '.srt'):
-								os.remove(os.path.splitext(latest)[0]+e)
+						for e in ('.meta','.mp4', '.srt', '.log'):
+								try:
+										os.remove(os.path.splitext(latest)[0]+e)
+								except OSError: pass
 		if queue: queue.put(float(quit_position[0]))
 		else: return float(quit_position[0])
 

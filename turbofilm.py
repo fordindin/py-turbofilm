@@ -19,7 +19,7 @@ import time
 import Queue
 import turboplay
 import time
-from fetcher import fetcher
+from fetcher import fetcher, pfetcher
 import config
 
 #selfpath = os.path.realpath(sys.argv[0])
@@ -130,8 +130,10 @@ def main(argv):
 		if play:
 				pos = 0
 				queue = Queue.Queue()
-				fetch_th = threading.Thread(target=fetcher, args=(metadata, iasid, dir_name, quality),
-						kwargs={"silent":True})
+				outdata = {}
+				fetch_th = threading.Thread(target=pfetcher, args=(metadata, iasid, dir_name,
+						quality),
+						kwargs={"silent":True, "outdata":outdata})
 				fetch_th.start()
 				wait_time = 1
 				total_fetched_sec = 0
@@ -141,16 +143,7 @@ def main(argv):
 				logfd = open(dir_name+".log", "a+")
 				saved_metadata = turboplay.load_saved_meta(dir_name+".meta")
 				play_th = threading.Thread(target=lambda a: a)
-				if not os.path.isfile(dir_name+".mp4"):
-						bsize = 0
-				else:
-						bsize = os.stat(dir_name+".mp4").st_size
-
-				if bsize >= float(metadata["sizes"][quality]):
-						fetch_done = True
-				else:
-						fetch_done = False
-
+				"""
 				while float(pos)/float(metadata["duration"]) < 0.98 and (fetch_th.isAlive() or
 								fetch_done):
 						total = average*nprobes
@@ -194,8 +187,9 @@ def main(argv):
 								#play_th.join()
 								if not queue.empty():
 										pos = queue.get()
+										"""
 		else:
-				fetcher(metadata, iasid, dir_name, quality)
+				pfetcher(metadata, iasid, dir_name, quality)
 
 
 if __name__ == "__main__":
