@@ -36,15 +36,16 @@ def fetch_sub(infile, srt_location="/Users/dindin/tmp/lastflash.srt"):
 		print type(data)
 		dom = xml.dom.minidom.parseString(data)
 		for e in dom.getElementsByTagName("subtitle"):
+				data = ""
 				try: 
 						e.getElementsByTagName("start")[0].childNodes[0].data
 						counter+=1
-						srt.write(u"%s\n" % (counter))
-						srt.write(u"%s --> %s\n" % (
+						data+=u"%s\n" % (counter)
+						data+=u"%s --> %s\n" % (
 							sec_format(e.getElementsByTagName("start")[0].childNodes[0].data),
-							sec_format(e.getElementsByTagName("end")[0].childNodes[0].data)))
-						srt.write("%s\n\n" %
-								e.getElementsByTagName("text")[0].childNodes[0].data)
+							sec_format(e.getElementsByTagName("end")[0].childNodes[0].data))
+						data+="%s\n\n" % e.getElementsByTagName("text")[0].childNodes[0].data
+						srt.write(data)
 				except IndexError: pass
 		srt.close()
 
