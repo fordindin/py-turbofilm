@@ -44,11 +44,28 @@ def fetcher(metadata, iasid, dir_name, quality,  silent=False):
 
 def pfetcher(metadata, iasid, dir_name, quality,  silent=False, bufsize=524288,
 				outdata=None):
+		print ""
+		def pprint(metadata, sec):
+				if not silent:
+						#sys.stdout.flush()
+						sys.stdout.write("\b"*51)
+						sys.stdout.write("\f")
+						sec = float(size)/metadata["bitrate"]
+						sys.stdout.write("\n% 6d seconds fetched % 6d seconds total (% 3d%%)" % (
+								int(sec),
+								int(metadata["duration"]),
+								int(float(sec)/float(metadata["duration"])*100))
+								)
+						sys.stdout.flush()
+
 		fpath = dir_name+".mp4"
 		if os.path.isfile(fpath):
 				size = os.stat(fpath).st_size
 		else:
 				size = 0
+		if size >= int(metadata["sizes"][quality])-1024:
+				print "Already fetched"
+				return True
 		f = open(fpath, "a")
 		req = urllib2.Request(
 								cdn_url(iasid,
@@ -64,25 +81,11 @@ def pfetcher(metadata, iasid, dir_name, quality,  silent=False, bufsize=524288,
 		sec = float(size)/metadata["bitrate"]
 		if outdata:
 				outdata.updata({"size":size, "sec":sec})
-		if not silent:
-				sys.stdout.write("% 6d seconds fetched % 6d seconds total (% 3d%%)" % (
-						int(sec),
-						int(metadata["duration"]),
-						int(float(sec)/float(metadata["duration"])*100))
-						)
-				sys.stdout.flush()
+		pprint(metadata, sec)
 		while buf:
 				size+=bufsize
 				f.write(buf)
 				f.flush()
-				if not silent:
-						sys.stdout.write("\b"*50)
-						sys.stdout.flush()
-						sec = float(size)/metadata["bitrate"]
-						sys.stdout.write("% 6d seconds fetched % 6d seconds total (% 3d%%)" % (
-								int(sec),
-								int(metadata["duration"]),
-								int(float(sec)/float(metadata["duration"])*100))
-								)
-						sys.stdout.flush()
+				pprint(metadata, sec)
 				buf  = r.read(bufsize)
+		return True
