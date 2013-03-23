@@ -77,7 +77,7 @@ def main(argv):
 				t_name = r.choice(tr)[1]
 
 		if len(argv) == 2:
-				series_data = sdata_RE.match(argv[1])
+				series_data = config.sdata_RE.match(argv[1])
 				if series_data:
 						t_name, season, number = series_data.groups()
 				else:
@@ -92,7 +92,7 @@ def main(argv):
 				series_data = config.sdata_RE.match(url)
 				t_name, season, number = series_data.groups()
 		else:
-				url =  sdata_TMPL % (config.proto, t_name, season,
+				url =  config.sdata_TMPL % (config.proto, t_name, season,
 						number)
 				
 
