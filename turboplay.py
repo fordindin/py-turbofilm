@@ -8,7 +8,9 @@ import subprocess
 import json
 from subprocess import Popen
 import remoteMeta
-if __name__ == "__main__": from turbofilm import wrkdir
+import config
+
+#if __name__ == "__main__": from turbofilm import wrkdir
 
 def load_saved_meta(fpath):
 		fd = open(fpath)
@@ -30,7 +32,7 @@ def mplay(argv, latest=None, queue=None):
 						if a[1] > b[1]: return 1
 						elif a[1] == b[1]: return 0
 						else: return -1
-				os.path.walk(wrkdir, wfunction, None)
+				os.path.walk(config.wrkdir, wfunction, None)
 				ctime.sort(cmp=sort_cmp)
 				try:
 						latest = ctime[-1][0]
