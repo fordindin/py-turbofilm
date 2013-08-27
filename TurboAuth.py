@@ -34,14 +34,14 @@ class TurboAuth:
 				self.password = password
 
 		def get_cookies(self):
-				req = urllib2.urlopen(config.passport_auth_url)
+				req = urllib2.urlopen(config.auth_url)
 				datadict = {
 						"login": self.login,
 						"passwd": self.password,
 						"remember": "on",
 				}
 				data = urllib.urlencode(datadict)
-				req = urllib2.Request(passport_auth_url, data, config.headers)
+				req = urllib2.Request(config.auth_url, data, config.headers)
 				response = urllib2.urlopen(req)
 				the_page = response.read()
 				self.cookie_jar.save(cj)
