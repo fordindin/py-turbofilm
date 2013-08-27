@@ -1,37 +1,20 @@
 #!/usr/bin/env python
 
 import GetPage
-from HTMLParser import HTMLParser
+from MyHTMLParser import UnseenHTMLParser
 import re
 import config
 
-class MyHTMLParser(HTMLParser):
-		tstack = []
-		unseen = []
-		unseen_text = ""
-		epcounthead_opened = False
-		def handle_starttag(self, tag, attrs):
-				self.tstack.append((tag,attrs))
-				if tag == 'a' and self.tstack[-2][1][0][1] == 'myseriesbox':
-						self.unseen.append(attrs[0][1])
-				if tag == 'span' and ('id', 'epcounthead') in attrs:
-						self.epcounthead_opened = True
-		def handle_endtag(self, tag):
-				if self.epcounthead_opened:
-						self.epcounthead_opened = False
-				self.tstack.pop()
-		def handle_startendtag(self, tag, attrs):
-				pass
-		def handle_data(self, data):
-				if self.epcounthead_opened:
-						self.unseen_text =  data
-		def get_unseen(self):
-				return self.unseen
-		def get_unseen_text(self):
-				return self.unseen_text
+
+def get_series_ssn(t_name, offset=0):
+		url = lastunseen(t_name)
+		series_data = config.sdata_RE.match(url)
+		t_name, season, number = series_data.groups()
+		number = int(number) + offset
+		return t_name, season, number
 
 def lastunseen(seriesName):
-	parser = MyHTMLParser()
+	parser = UnseenHTMLParser()
 	page = GetPage.getpage(config.series_page)["page"]
 	parser.feed(page)
 	for u in parser.get_unseen():
@@ -42,7 +25,7 @@ def listunseen(retlist=False):
 	unseen = {}
 	unseen_list = []
 	retstr = "\n"
-	parser = MyHTMLParser()
+	parser = UnseenHTMLParser()
 	page = GetPage.getpage(config.series_page)["page"]
 	parser.feed(page)
 	for u in parser.get_unseen():
