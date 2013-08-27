@@ -16,7 +16,7 @@ sub_base="http://sub.turbofilm.tv/en/"
 
 login = "dindin@dindin.ru"
 
-passport_auth_url="https://turbofilm.tv/Signin"
+auth_url="https://turbofilm.tv/Signin"
 
 headers =  { 'User-Agent' : "Mozilla/5.0 compatible pure-python Turbofilm.tv client" }
 
