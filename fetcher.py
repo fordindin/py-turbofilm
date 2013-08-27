@@ -7,7 +7,7 @@ from cdn_url import cdn_url
 import config
 import urllib2
 
-def fetcher(metadata, iasid, dir_name, quality,  silent=False):
+def fetcher(metadata, iasid, file_base, quality,  silent=False):
 		sts = 1
 		trycount = 0
 		while sts != 0:
@@ -15,9 +15,9 @@ def fetcher(metadata, iasid, dir_name, quality,  silent=False):
 
 				wget_args = [
 								"wget",
-								"-c", "-O", dir_name+".mp4",
+								"-c", "-O", file_base+".mp4",
 								"--no-check-certificate",
-								cdn_url(iasid,
+								cdn_url(metadata["iasid"],
 										metadata["eid"],
 										metadata["sources2"][quality],
 										0,
@@ -40,25 +40,26 @@ def fetcher(metadata, iasid, dir_name, quality,  silent=False):
 
 				trycount += 1
 				if trycount > config.max_fetch_retry: break
-		os.utime(dir_name+".mp4", None)
+		os.utime(file_base+".mp4", None)
 
-def pfetcher(metadata, iasid, dir_name, quality,  silent=False, bufsize=524288,
+def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
 				outdata=None):
 		print ""
+		w_template="% 6d seconds fetched % 6d seconds total (% 3d%%)"
 		def pprint(metadata, sec):
 				if not silent:
 						#sys.stdout.flush()
-						sys.stdout.write("\b"*51)
-						sys.stdout.write("\f")
+						sys.stdout.write("\b"*len(w_template % (0,0,0)))
+						#sys.stdout.write("\f")
 						sec = float(size)/metadata["bitrate"]
-						sys.stdout.write("\n% 6d seconds fetched % 6d seconds total (% 3d%%)" % (
+						sys.stdout.write(w_template % (
 								int(sec),
 								int(metadata["duration"]),
 								int(float(sec)/float(metadata["duration"])*100))
 								)
 						sys.stdout.flush()
 
-		fpath = dir_name+".mp4"
+		fpath = file_base+".mp4"
 		if os.path.isfile(fpath):
 				size = os.stat(fpath).st_size
 		else:
@@ -68,7 +69,7 @@ def pfetcher(metadata, iasid, dir_name, quality,  silent=False, bufsize=524288,
 				return True
 		f = open(fpath, "a")
 		req = urllib2.Request(
-								cdn_url(iasid,
+								cdn_url(metadata["iasid"],
 										metadata["eid"],
 										metadata["sources2"][quality],
 										0,
