@@ -7,16 +7,10 @@ import tempfile
 import subprocess
 import json
 from subprocess import Popen
-import remoteMeta
+import metaWrapper
 import config
 
 #if __name__ == "__main__": from turbofilm import wrkdir
-
-def load_saved_meta(fpath):
-		fd = open(fpath)
-		metadata = json.load(fd)
-		fd.close()
-		return metadata
 
 def mplay(argv, latest=None, queue=None):
 		if not latest:
@@ -41,7 +35,7 @@ def mplay(argv, latest=None, queue=None):
 						sys.exit(1)
 		srt = os.path.splitext(latest)[0]+'.srt'
 
-		metadata = load_saved_meta(os.path.splitext(latest)[0]+'.meta')
+		metadata = metaWrapper.load_saved_meta(os.path.splitext(latest)[0]+'.meta')
 
 		args = [
 				"mplayer",
@@ -76,8 +70,7 @@ def mplay(argv, latest=None, queue=None):
 
 
 		if float(quit_position[0])/float(metadata["duration"]) > 0.98:
-				response = remoteMeta.watchEpisode(metadata["eid"])
-				print response
+				response = metaWrapper.watchEpisode(metadata["eid"])
 				if response == {'page': ''}:
 						print '\n\nEpisode has been watched'
 						print 'Cleanup...'

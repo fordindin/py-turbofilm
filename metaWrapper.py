@@ -11,6 +11,21 @@ from cdn_url import ssn_url
 from wierd_b64_decode import w_base64_decode as wb64
 import xml2obj
 
+
+def watchEpisode(eid):
+				postdata = { "watch": 1, "eid": eid }
+				return GetPage.getpage(config.watchUrl, postdata)
+
+def unwatchEpisode(eid):
+				postdata = { "watch": 0, "eid": eid }
+				return GetPage.getpage(config.watchUrl, postdata)
+
+def load_saved_meta(fpath):
+		fd = open(fpath)
+		metadata = json.load(fd)
+		fd.close()
+		return metadata
+
 def get_metadata(t_name, quality, offset=0):
 		t_name, season, number = get_series_ssn(t_name, offset=offset)
 		fname_base = "S%02dE%02d" % (int(season), int(number))

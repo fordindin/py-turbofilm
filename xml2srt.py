@@ -27,13 +27,13 @@ def main(argv):
 def fetch_sub(infile, srt_location="/Users/dindin/tmp/lastflash.srt"):
 		if not config.proto_RE.match(infile):
 				infile = config.proto + infile
-		print infile
+		#print infile
 		f = urllib2.urlopen(infile)
 		srt = file(srt_location, "w")
 		counter = 0
 
 		data = unicode(f.read(), errors='ignore') #.decode("utf-8-sig").strip()
-		print type(data)
+		#print type(data)
 		dom = xml.dom.minidom.parseString(data)
 		for e in dom.getElementsByTagName("subtitle"):
 				data = ""

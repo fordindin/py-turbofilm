@@ -43,8 +43,8 @@ def fetcher(metadata, iasid, file_base, quality,  silent=False):
 		os.utime(file_base+".mp4", None)
 
 def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
-				outdata=None):
-		print ""
+				outdata=None, queue=None):
+		#print ""
 		w_template="% 6d seconds fetched % 6d seconds total (% 3d%%)"
 		def pprint(metadata, sec):
 				if not silent:
@@ -66,6 +66,7 @@ def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
 				size = 0
 		if size >= int(metadata["sizes"][quality])-1024:
 				print "Already fetched"
+				if queue: queue.put(True)
 				return True
 		f = open(fpath, "a")
 		req = urllib2.Request(
@@ -89,4 +90,5 @@ def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
 				f.flush()
 				pprint(metadata, sec)
 				buf  = r.read(bufsize)
+		if queue: queue.put(True)
 		return True
