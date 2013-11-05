@@ -32,7 +32,7 @@ def get_metadata(t_name, quality, offset=0):
 
 		file_base = os.path.join(config.wrkdir, t_name, fname_base)
 		parser = MetaHTMLParser()
-		page = GetPage.getpage(ssn_url(t_name, season, number))["page"]
+		page = GetPage.getpage(ssn_url(t_name, season, number))["page"].decode('utf-8')
 		iasid = GetPage.p.check_ssid()
 		parser.feed(page)
 		xml_metadata = wb64(unquote(parser.metadata))
