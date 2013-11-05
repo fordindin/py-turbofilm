@@ -4,6 +4,9 @@
 import urllib, urllib2, cookielib
 import os, re, time
 import config
+import socks
+
+from socksipyhandler import SocksiPyHandler
 
 """ This module emulates Turbofilm.tv auth.
 It checks cookies in given cookie jar, and put there
@@ -19,7 +22,13 @@ class TurboAuth:
 				self.cookie_jar.clear_expired_cookies()
 				self.cookie_jar.clear_session_cookies()
 				# install cookies
-				opener=urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cookie_jar))
+				openers_list = []
+				if config.socks_enable:
+						openers_list.append(
+								SocksiPyHandler(socks.PROXY_TYPE_SOCKS4,
+								config.socks_ip, config.socks_port))
+				openers_list.append(urllib2.HTTPCookieProcessor(self.cookie_jar))
+				opener=urllib2.build_opener(*openers_list)
 				urllib2.install_opener(opener)
 				self.login = login
 				self.set_password(password)

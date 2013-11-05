@@ -27,6 +27,8 @@ cdn_authkey = "A2DC51DE0F8BC1E9"
 
 max_fetch_retry = 5
 
+wait_time = 1
+
 series_page = "https://turbofilm.tv/My/Series"
 
 watchUrl = 'https://turbofilm.tv/services/epwatch'
@@ -35,3 +37,9 @@ sdata_RE = re.compile("http(?:s)+://turbofilm.tv/Watch/(.*)/Season(.*)/Episode(.
 sdata_TMPL = "%s//turbofilm.tv/Watch/%s/Season%s/Episode%s"
 
 wrkdir = "%s/turbofilm" % os.getenv("HOME")
+
+socks_enable = True
+socks_ip = "199.231.185.97"
+socks_port = 1080
+#socks_ip = "127.0.0.1"
+#socks_port = 9050
