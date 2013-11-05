@@ -3,7 +3,9 @@
 from HTMLParser import HTMLParser
 
 class MetaHTMLParser(HTMLParser):
-		metadata = None
+		def __init__(self):
+				HTMLParser.__init__(self)
+				metadata = None
 		def handle_starttag(self, tag, attrs):
 				if ("id", "metadata") in attrs:
 						for a in attrs:
@@ -11,10 +13,12 @@ class MetaHTMLParser(HTMLParser):
 										self.metadata=a[1]
 
 class UnseenHTMLParser(HTMLParser):
-		tstack = []
-		unseen = []
-		unseen_text = ""
-		epcounthead_opened = False
+		def __init__(self):
+				HTMLParser.__init__(self)
+				self.tstack = []
+				self.unseen = []
+				self.unseen_text = ""
+				self.epcounthead_opened = False
 		def handle_starttag(self, tag, attrs):
 				self.tstack.append((tag,attrs))
 				if tag == 'a' and self.tstack[-2][1][0][1] == 'myseriesbox':
