@@ -10,7 +10,6 @@ def get_series_ssn(t_name, offset=0):
 		url = lastunseen(t_name)
 		series_data = config.sdata_RE.match(url)
 		t_name, season, number = series_data.groups()
-		print t_name, season, number
 		number = int(number) + offset
 		return t_name, season, number
 
@@ -20,7 +19,6 @@ def lastunseen(seriesName):
 	parser.feed(page)
 	for u in parser.get_unseen():
 			if re.match('.*\/%s\/.*' % seriesName, u):
-					print config.turbofilm_base + u
 					return config.turbofilm_base + u
 
 def listunseen(retlist=False):
