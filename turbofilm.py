@@ -17,6 +17,7 @@ import time
 from fetcher import fetcher, pfetcher
 import metaWrapper
 import config
+from functions import hangmon
 
 #selfpath = os.path.realpath(sys.argv[0])
 #selfdir = os.path.dirname(selfpath)
@@ -69,25 +70,29 @@ def main(argv):
 				selfname, t_name = argv
 
 		else: usage(argv[0])
+		if not os.path.isdir(os.path.join(config.wrkdir,t_name)): os.mkdir(os.path.join(config.wrkdir,t_name))
 
 		play_th = threading.Thread(target=lambda a: a)
 		play_queue = Queue.Queue()
 		fetch_queue = Queue.Queue()
+		tmp_queue = Queue.Queue()
+		pid_queue = Queue.Queue()
+		mplayer_pid = None
 
 
 		if play:
 				while True:
 						if play_th.is_alive():
-								time.sleep(wait_time)
+								hangmon(tmpfilename, mplayer_pid)
+								time.sleep(config.wait_time)
 								continue
 						else:
 
-								if "fetch_done" not in locals().keys(): fetch_done = False
+								#if "fetch_done" not in locals().keys(): fetch_done = False
+								fetch_done = False
 
 								if not fetch_done:
 										metadata, file_base = get_metadata(t_name, quality)
-										print metadata
-										print file_base
 										quality = metadata["fetched_quality"]
 										print "Got metadata" # metadata
 
@@ -97,42 +102,37 @@ def main(argv):
 										except KeyError:
 												print "Subtitles not found"
 
-										pos = 0
-										total_fetched_sec = 0
-										nprobes = 0
-										average = 0
-										asize = 0
-										outdata = {}
-										wait_time = 1
-										time.sleep(wait_time)
+										pos = nprobes = average = asize = 0
+										tmpfilename = None
 
 										fetch_th = threading.Thread(target=pfetcher, args=(metadata, file_base,
 												quality),
-												kwargs={"silent":True, "outdata":outdata, "queue" : fetch_queue})
+												kwargs={"silent":True, "queue" : fetch_queue})
 										fetch_th.daemon = True
 										fetch_th.start()
-										logfd = open(file_base+".log", "a+")
-										saved_metadata = metaWrapper.load_saved_meta(file_base+".meta")
+										# give fetch thread a second
+										time.sleep(config.wait_time)
 
 										if not fetch_queue.empty():
 												fetch_done = fetch_queue.get()
 
-										while float(pos)/float(metadata["duration"]) < 0.98 and (fetch_th.is_alive() or
-														fetch_done):
+										while float(pos)/float(metadata["duration"]) < 0.98 and (fetch_th.is_alive() or fetch_done):
 												total = average*nprobes
+												hangmon(tmpfilename, mplayer_pid)
 												if not os.path.isfile(file_base+".mp4"):
 														bsize = 0
 														# create empty file
 														open(file_base+".mp4","a").close()
 												else:
 														bsize = os.stat(file_base+".mp4").st_size
-												if not fetch_done: time.sleep(wait_time)
-												asize = os.stat(file_base+".mp4").st_size
+												#asize = os.stat(file_base+".mp4").st_size
 												if asize == bsize and fetch_th.is_alive(): continue
 												if bsize >= float(metadata["sizes"][quality]):
 														fetch_done = True
-												fetch_per_sec = float(asize-bsize)/float(metadata["bitrate"])/wait_time
+												fetch_per_sec = float(asize-bsize)/float(metadata["bitrate"])/config.wait_time
+												fetched_secs = float(bsize)/float(metadata["bitrate"])
 												nprobes+=1
+												"""
 												if nprobes % 15 == 0 and not fetch_done:
 														print >> logfd, "%s : total time fetched: %s" % (
 																time.strftime("%H:%M %d-%m-%Y"), total)
@@ -141,7 +141,7 @@ def main(argv):
 														print >> logfd, "%s : last period fetch speed (sps): %s" % (
 																time.strftime("%H:%M %d-%m-%Y"), fetch_per_sec)
 														print >> logfd, "%s : last period fetch speed (kbps): %s" % (
-																time.strftime("%H:%M %d-%m-%Y"), float(asize-bsize)/wait_time/1024)
+																time.strftime("%H:%M %d-%m-%Y"), float(asize-bsize)/config.wait_time/1024)
 														print >> logfd, "%s : total size (kbps): %s" % (
 																time.strftime("%H:%M %d-%m-%Y"), asize/1024)
 														if saved_metadata.has_key("lastpos"):
@@ -149,23 +149,45 @@ def main(argv):
 																		time.strftime("%H:%M %d-%m-%Y"),
 																		saved_metadata["lastpos"]*metadata["bitrate"]/1024)
 														logfd.flush()
+												"""
 												average = (total+fetch_per_sec)/nprobes
+
 												if not fetch_queue.empty():
 														fetch_done = fetch_queue.get()
-												if not total and not fetch_done:
-														continue
-												if ( (average > 3 and nprobes > 1) or fetch_done ) \
-														and not play_th.is_alive() \
-														and float(pos)/float(metadata["duration"]) < 0.98:
+
+												if not play_queue.empty():
+														pos = play_queue.get()
+
+												if (not total and not fetch_done) or \
+													 (float(pos)/float(metadata["duration"]) >= 0.98):
+															 continue
+
+												if ( ( ( average > 3 and nprobes > 3) or fetch_done ) \
+																or float(fetched_secs)-float(pos) > 10*average ) \
+																and not play_th.is_alive(): # and \
 														play_th = threading.Thread(target=turboplay.mplay, args=(playargs,),
-																		kwargs={"latest": file_base+".mp4", "queue":play_queue})
+																		kwargs={"latest": file_base+".mp4",
+																				"queue":play_queue, "tmpqueue":tmp_queue,
+																				"pidqueue":pid_queue})
+														print "Playing: \n%s Season %s Episode %s" % (t_name,
+																metadata["season"], metadata["number"])
+														if not os.path.isfile(file_base+".mp4"):
+																open(file_base+".mp4","a").close()
 														play_th.start()
 														#play_th.join()
+														# wait until tmp_queue will be filled with tmpfile value
+														while tmp_queue.empty():
+																time.sleep(config.wait_time)
+														tmpfilename = tmp_queue.get()
+
 														if not play_queue.empty():
 																pos = play_queue.get()
+														if not pid_queue.empty():
+																mplayer_pid = int(pid_queue.get())
+
 														if float(pos)/float(metadata["duration"]) >= 0.98:
 																fetch_done = False
-												else: time.sleep(wait_time)
+												else: time.sleep(config.wait_time)
 		else:
 				metadata, file_base = get_metadata(t_name, quality)
 				print "Got metadata" # metadata
