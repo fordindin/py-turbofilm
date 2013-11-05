@@ -81,8 +81,8 @@ def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
 
 		buf = r.read(bufsize)
 		sec = float(size)/metadata["bitrate"]
-		if outdata:
-				outdata.updata({"size":size, "sec":sec})
+		#if outdata:
+		#		outdata.updata({"size":size, "sec":sec})
 		pprint(metadata, sec)
 		while buf:
 				size+=bufsize
@@ -90,5 +90,6 @@ def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
 				f.flush()
 				pprint(metadata, sec)
 				buf  = r.read(bufsize)
+		print "Fetch done"
 		if queue: queue.put(True)
 		return True
