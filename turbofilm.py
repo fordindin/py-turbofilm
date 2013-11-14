@@ -7,7 +7,7 @@ import re
 import sys
 import json
 from subprocess import Popen, PIPE
-from lastunseen import listunseen
+from lastunseen import listunseen, NoMoreSeries
 from random import Random
 import threading
 import time
@@ -92,7 +92,11 @@ def main(argv):
 								fetch_done = False
 
 								if not fetch_done:
-										metadata, file_base = get_metadata(t_name, quality)
+										try:
+												metadata, file_base = get_metadata(t_name, quality)
+										except NoMoreSeries:
+												print "No more series"
+												sys.exit(0)
 										quality = metadata["fetched_quality"]
 										print "Got metadata" # metadata
 
