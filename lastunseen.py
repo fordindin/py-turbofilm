@@ -5,9 +5,12 @@ from MyHTMLParser import UnseenHTMLParser
 import re
 import config
 
+class NoMoreSeries(Exception):
+		pass
 
 def get_series_ssn(t_name, offset=0):
 		url = lastunseen(t_name)
+		if not url: raise NoMoreSeries
 		series_data = config.sdata_RE.match(url)
 		t_name, season, number = series_data.groups()
 		number = int(number) + offset
