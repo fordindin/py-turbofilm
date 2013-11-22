@@ -12,7 +12,7 @@ import config
 
 #if __name__ == "__main__": from turbofilm import wrkdir
 
-def mplay(argv, latest=None, queue=None, tmpqueue=None, pidqueue=None):
+def mplay(argv, latest=None, queue=None):
 		if not latest:
 				ctime = []
 				def wfunction(*argv):
@@ -49,12 +49,12 @@ def mplay(argv, latest=None, queue=None, tmpqueue=None, pidqueue=None):
 
 		devnull=open(os.devnull, "w")
 		tmp = tempfile.NamedTemporaryFile()
-		if tmpqueue: tmpqueue.put(tmp.name)
+		if queue: queue.put_nowait({"tmpfile": tmp.name})
 		tee = subprocess.Popen(["tee", tmp.name], stdin=subprocess.PIPE,
 						stdout=devnull,
 						)
 		p = Popen(args, stdout=tee.stdin, stderr=devnull)
-		if pidqueue: pidqueue.put(p.pid)
+		if queue: queue.put_nowait({"pid": p.pid})
 		pid, sts = os.waitpid(p.pid, 0)
 		tmp.flush()
 		tee.stdin.flush()
@@ -83,7 +83,8 @@ def mplay(argv, latest=None, queue=None, tmpqueue=None, pidqueue=None):
 								try:
 										os.remove(os.path.splitext(latest)[0]+e)
 								except OSError: pass
-		if queue: queue.put(float(quit_position[0]))
+		if queue: queue.put({"pos":float(quit_position[0])})
+		if queue: queue.put({"cleaned_up":True})
 		tee.stdin.close()
 		return float(quit_position[0])
 

@@ -5,6 +5,10 @@ import re
 
 def hangmon(tmpfilename, mplayer_pid):
 		if tmpfilename and os.path.exists(tmpfilename):
+				try: 
+						os.kill(mplayer_pid, 0)
+				except OSError:
+						return None
 				offset = os.stat(tmpfilename).st_size - 150
 				tmpfile = open(tmpfilename, "r")
 				tmpfile.seek(offset)
