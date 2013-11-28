@@ -38,7 +38,7 @@ sdata_TMPL = "%s//turbofilm.tv/Watch/%s/Season%s/Episode%s"
 
 wrkdir = "%s/turbofilm" % os.getenv("HOME")
 
-socks_enable = True
+socks_enable = False
 socks_ip = "199.231.185.97"
 socks_port = 1080
 #socks_ip = "127.0.0.1"
