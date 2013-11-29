@@ -135,6 +135,7 @@ def main(argv):
 										fetch_done = False
 										fsub_fetch_done = False
 										metadata_fetch_done = False
+										continue
 
 						if not play_th.is_alive():
 								play_th = threading.Thread(target=turboplay.mplay, args=(playargs,),
