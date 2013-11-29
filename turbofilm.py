@@ -129,7 +129,10 @@ def main(argv):
 								if obj.has_key("pos"): pos = obj["pos"]
 								if obj.has_key("tmpfile"): tmpfilename = obj["tmpfile"]
 								if obj.has_key("pid"): mplayer_pid = obj["pid"]
-								if obj.has_key("cleaned_up"): fetch_done = False
+								if obj.has_key("cleaned_up"):
+										fetch_done = False
+										metadata_fetch_done = False
+										continue
 
 						if not play_th.is_alive():
 								play_th = threading.Thread(target=turboplay.mplay, args=(playargs,),
