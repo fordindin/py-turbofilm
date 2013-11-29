@@ -104,8 +104,9 @@ def main(argv):
 
 						if not sub_fetch_done:
 								try:
-										fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
-										print "Got subtitles"
+										if metadata_fetch_done:
+												fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
+												print "Got subtitles"
 								except KeyError:
 										print "Subtitles not found"
 								sub_fetch_done = True
@@ -114,12 +115,13 @@ def main(argv):
 								open(file_base+".mp4","a").close()
 
 						if not fetch_th.is_alive() and not fetch_done:
-								fetch_th = threading.Thread(target=pfetcher, args=(metadata, file_base,
-										quality),
-										kwargs={"silent":True, "queue" : fetch_queue})
-								fetch_th.daemon = True
-								fetch_th.start()
-								time.sleep(config.wait_time)
+								if metadata_fetch_done:
+										fetch_th = threading.Thread(target=pfetcher, args=(metadata, file_base,
+												quality),
+												kwargs={"silent":True, "queue" : fetch_queue})
+										fetch_th.daemon = True
+										fetch_th.start()
+										time.sleep(config.wait_time)
 
 						if not fetch_queue.empty():
 								fetch_done = fetch_queue.get()
@@ -131,8 +133,8 @@ def main(argv):
 								if obj.has_key("pid"): mplayer_pid = obj["pid"]
 								if obj.has_key("cleaned_up"):
 										fetch_done = False
+										fsub_fetch_done = False
 										metadata_fetch_done = False
-										continue
 
 						if not play_th.is_alive():
 								play_th = threading.Thread(target=turboplay.mplay, args=(playargs,),
