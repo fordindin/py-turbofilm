@@ -12,6 +12,9 @@ import config
 
 #if __name__ == "__main__": from turbofilm import wrkdir
 
+class NotReadyYet(Exception):
+		pass
+
 def mplay(argv, latest=None, queue=None):
 		if not latest:
 				ctime = []
@@ -35,7 +38,11 @@ def mplay(argv, latest=None, queue=None):
 						sys.exit(1)
 		srt = os.path.splitext(latest)[0]+'.srt'
 
-		metadata = metaWrapper.load_saved_meta(os.path.splitext(latest)[0]+'.meta')
+		try:
+				metadata = metaWrapper.load_saved_meta(os.path.splitext(latest)[0]+'.meta')
+		except IOError:
+				print "Seems fetcher is not ready yet"
+				return None
 
 		args = [
 				"mplayer",
