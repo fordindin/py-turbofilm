@@ -76,6 +76,7 @@ def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
 										0,
 										"en")
 								)
+		print req.get_full_url()
 		req.headers['Range'] = 'bytes=%s-%s' % (size, metadata["sizes"][quality])
 		r = urllib2.urlopen(req)
 

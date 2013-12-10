@@ -9,6 +9,7 @@ import urllib, urllib2, cookielib, getpass
 from TurboAuth import TurboAuth
 import config
 
+
 p = TurboAuth(config.login)
 
 def auth(login):

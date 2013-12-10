@@ -2,9 +2,14 @@
 # coding: utf-8
 
 import urllib, urllib2, cookielib
+import httplib
 import os, re, time
 import config
+import socket
 import socks
+import ssl
+import dns.resolver
+import sys
 
 from socksipyhandler import SocksiPyHandler
 
@@ -12,6 +17,8 @@ from socksipyhandler import SocksiPyHandler
 It checks cookies in given cookie jar, and put there
 valid cookies in case of expiration"""
 
+r = dns.resolver.Resolver(filename='resolv.conf')
+dns.resolver.override_system_resolver( dns.resolver.Resolver(filename='resolv.conf') )
 cj = config.cookie_path
 
 class TurboAuth:
