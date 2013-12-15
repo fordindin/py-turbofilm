@@ -17,7 +17,7 @@ from socksipyhandler import SocksiPyHandler
 It checks cookies in given cookie jar, and put there
 valid cookies in case of expiration"""
 
-r = dns.resolver.Resolver(filename='resolv.conf')
+
 dns.resolver.override_system_resolver( dns.resolver.Resolver(filename='resolv.conf') )
 cj = config.cookie_path
 
