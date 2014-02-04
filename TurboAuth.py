@@ -8,7 +8,6 @@ import config
 import socket
 import socks
 import ssl
-import dns.resolver
 import sys
 
 from socksipyhandler import SocksiPyHandler
@@ -18,7 +17,10 @@ It checks cookies in given cookie jar, and put there
 valid cookies in case of expiration"""
 
 
-dns.resolver.override_system_resolver( dns.resolver.Resolver(filename='resolv.conf') )
+if config.myresolver:
+		import config.myresolver
+		dns.resolver.override_system_resolver(dns.resolver.Resolver(filename=config.myresolver) )
+
 cj = config.cookie_path
 
 class TurboAuth:
