@@ -42,6 +42,7 @@ def main(argv):
 		quality="hq"
 		playargs=[]
 		play=False
+		offline=False
 		if "-lq" in argv:
 				quality = "default"
 				argv.pop(argv.index("-lq"))
@@ -54,6 +55,9 @@ def main(argv):
 				for i in range(playindex, len(argv)):
 						playargs.append(argv.pop(playindex))
 				playargs.pop(0)
+		if "offline" in argv:
+				offline=True
+				argv.pop(argv.index("offline"))
 		if len(argv) == 1:
 				turboplay.mplay(playargs)
 				sys.exit(0)
@@ -111,9 +115,6 @@ def main(argv):
 										print "Subtitles not found"
 								sub_fetch_done = True
 
-						if not os.path.isfile(file_base+".mp4"):
-								open(file_base+".mp4","a").close()
-
 						if not fetch_th.is_alive() and not fetch_done:
 								if metadata_fetch_done:
 										fetch_th = threading.Thread(target=pfetcher, args=(metadata, file_base,
@@ -144,10 +145,20 @@ def main(argv):
 								play_th.start()
 								print "Playing: \n%s Season %s Episode %s" % (t_name,
 										metadata["season"], metadata["number"])
-						#play_th.join()
-						# wait until tmp_queue will be filled with tmpfile value
 						time.sleep(config.wait_time)
 
+		elif offline:
+				print "Fetching for offline: \n%s Season %s Episode %s" % (t_name,
+						metadata["season"], metadata["number"])
+				offset = 0
+				while True:
+						metadata, file_base = get_metadata(t_name, quality, offset=offset,
+										offline=True)
+						fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
+						pfetcher(metadata, file_base, quality)
+						offset += 1
+						#print t_name, metadata["season"], metadata["number"]
+					
 		else:
 				metadata, file_base = get_metadata(t_name, quality)
 				print "Got metadata" # metadata

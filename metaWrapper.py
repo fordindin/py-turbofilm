@@ -26,11 +26,14 @@ def load_saved_meta(fpath):
 		fd.close()
 		return metadata
 
-def get_metadata(t_name, quality, offset=0):
+def get_metadata(t_name, quality, offset=0, offline=False):
 		t_name, season, number = get_series_ssn(t_name, offset=offset)
 		fname_base = "S%02dE%02d" % (int(season), int(number))
 
-		file_base = os.path.join(config.wrkdir, t_name, fname_base)
+		target_dir = config.wrkdir
+		if offline:
+				target_dir = config.offline_dir
+		file_base = os.path.join(target_dir, t_name, fname_base)
 		parser = MetaHTMLParser()
 		page = GetPage.getpage(ssn_url(t_name, season, number))["page"].decode('utf-8')
 		iasid = GetPage.p.check_ssid()
@@ -47,6 +50,9 @@ def get_metadata(t_name, quality, offset=0):
 		metadata["iasid"] = iasid
 		metadata["season"] = season
 		metadata["number"] = number
+
+		if not os.path.isdir(os.path.dirname(file_base)):
+				os.mkdir(os.path.dirname(file_base))
 
 		if not os.path.isfile(file_base+".meta") or os.stat(file_base+".meta").st_size == 0:
 				fd = open(file_base+".meta", "w")
