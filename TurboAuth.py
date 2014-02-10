@@ -21,6 +21,7 @@ if config.myresolver:
 		import config.myresolver
 		dns.resolver.override_system_resolver(dns.resolver.Resolver(filename=config.myresolver) )
 
+#dns.resolver.override_system_resolver( dns.resolver.Resolver(filename='resolv.conf') )
 cj = config.cookie_path
 
 class TurboAuth:
