@@ -67,10 +67,6 @@ def main(argv):
 				t_name = r.choice(tr)[1]
 
 		if len(argv) == 2:
-				# obsolete
-				#series_data = config.sdata_RE.match(argv[1])
-				#if series_data:
-				#		t_name, season, number = series_data.groups()
 				selfname, t_name = argv
 
 		else: usage(argv[0])
@@ -152,8 +148,7 @@ def main(argv):
 						metadata["season"], metadata["number"])
 				offset = 0
 				while True:
-						metadata, file_base = get_metadata(t_name, quality, offset=offset,
-										offline=True)
+						metadata, file_base = get_metadata(t_name, quality, offset=offset)
 						fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
 						pfetcher(metadata, file_base, quality)
 						offset += 1
