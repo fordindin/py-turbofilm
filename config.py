@@ -39,7 +39,7 @@ sdata_TMPL = "%s//turbik.tv/Watch/%s/Season%s/Episode%s"
 
 wrkdir = "%s/turbofilm" % os.getenv("HOME")
 
-offline_dir = os.path.join(wrkdir, "offline")
+offline_store = os.path.join(wrkdir, "offline.pickle")
 
 socks_enable = False
 socks_ip = "199.231.185.97"

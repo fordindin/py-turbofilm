@@ -43,6 +43,7 @@ def main(argv):
 		playargs=[]
 		play=False
 		offline=False
+		offlineplay=False
 		if "-lq" in argv:
 				quality = "default"
 				argv.pop(argv.index("-lq"))
@@ -58,6 +59,13 @@ def main(argv):
 		if "offline" in argv:
 				offline=True
 				argv.pop(argv.index("offline"))
+		if "offlineplay" in argv:
+				offlineplay=True
+				playindex=argv.index("offlineplay")
+				for i in range(playindex, len(argv)):
+						playargs.append(argv.pop(playindex))
+				playargs.pop(0)
+
 		if len(argv) == 1:
 				turboplay.mplay(playargs)
 				sys.exit(0)
@@ -77,7 +85,6 @@ def main(argv):
 		play_queue = Queue.Queue()
 		fetch_queue = Queue.Queue()
 		mplayer_pid = None
-
 
 		logfd = sys.stdout
 
@@ -144,16 +151,19 @@ def main(argv):
 						time.sleep(config.wait_time)
 
 		elif offline:
-				print "Fetching for offline: \n%s Season %s Episode %s" % (t_name,
-						metadata["season"], metadata["number"])
 				offset = 0
 				while True:
 						metadata, file_base = get_metadata(t_name, quality, offset=offset)
+						print "Fetching for offline: \n%s Season %s Episode %s" % (t_name,
+								metadata["season"], metadata["number"])
 						fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
 						pfetcher(metadata, file_base, quality)
 						offset += 1
 						#print t_name, metadata["season"], metadata["number"]
 					
+		elif offlineplay:
+				while True:
+						turboplay.mplay(playargs, t_name=t_name, offline=True)
 		else:
 				metadata, file_base = get_metadata(t_name, quality)
 				print "Got metadata" # metadata

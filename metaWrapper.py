@@ -10,15 +10,29 @@ from lastunseen import get_series_ssn
 from cdn_url import ssn_url
 from wierd_b64_decode import w_base64_decode as wb64
 import xml2obj
+import pickle
 
+#def get_offline_watched_eids():
 
-def watchEpisode(eid):
-				postdata = { "watch": 1, "eid": eid }
+def watchEpisode(eid, offline=False):
+		postdata = { "watch": 1, "eid": eid }
+		if offline:
+				try:
+						f = open(cf.offline_store)
+						d = pickle.load(f)
+						f.close()
+				except OSError:
+						d = []
+				d.append(postdata)
+				f = open(cf.offline_store, "w+")
+				pickle.dump(d, f)
+				f.close()
+		else:
 				return GetPage.getpage(config.watchUrl, postdata)
 
 def unwatchEpisode(eid):
-				postdata = { "watch": 0, "eid": eid }
-				return GetPage.getpage(config.watchUrl, postdata)
+		postdata = { "watch": 0, "eid": eid }
+		return GetPage.getpage(config.watchUrl, postdata)
 
 def load_saved_meta(fpath):
 		fd = open(fpath)
@@ -26,13 +40,11 @@ def load_saved_meta(fpath):
 		fd.close()
 		return metadata
 
-def get_metadata(t_name, quality, offset=0, offline=False):
+def get_metadata(t_name, quality, offset=0):
 		t_name, season, number = get_series_ssn(t_name, offset=offset)
 		fname_base = "S%02dE%02d" % (int(season), int(number))
 
 		target_dir = config.wrkdir
-		if offline:
-				target_dir = config.offline_dir
 		file_base = os.path.join(target_dir, t_name, fname_base)
 		parser = MetaHTMLParser()
 		page = GetPage.getpage(ssn_url(t_name, season, number))["page"].decode('utf-8')
