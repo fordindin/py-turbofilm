@@ -18,15 +18,16 @@ def watchEpisode(eid, offline=False):
 		postdata = { "watch": 1, "eid": eid }
 		if offline:
 				try:
-						f = open(cf.offline_store)
+						f = open(config.offline_store)
 						d = pickle.load(f)
 						f.close()
-				except OSError:
+				except IOError:
 						d = []
 				d.append(postdata)
-				f = open(cf.offline_store, "w+")
+				f = open(config.offline_store, "w+")
 				pickle.dump(d, f)
 				f.close()
+				return {'page': ''}
 		else:
 				return GetPage.getpage(config.watchUrl, postdata)
 

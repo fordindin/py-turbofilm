@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from xml2srt import fetch_sub
-from metaWrapper import get_metadata
+from metaWrapper import get_metadata,watchEpisode
 import os
 import re
 import sys
@@ -18,6 +18,7 @@ from fetcher import fetcher, pfetcher
 import metaWrapper
 import config
 from functions import hangmon
+import pickle
 
 #selfpath = os.path.realpath(sys.argv[0])
 #selfdir = os.path.dirname(selfpath)
@@ -88,6 +89,18 @@ def main(argv):
 
 		logfd = sys.stdout
 
+		if not offlineplay:
+				f = open(config.offline_store)
+				d = pickle.load(f)
+				f.close()
+				td = list(d)
+				for e in td:
+						r = watchEpisode(e["eid"])
+						if r == {'page': ''}:
+								d.pop(d.index(e))
+				f = open(config.offline_store,"w+")
+				pickle.dump(d,f)
+				f.close()
 		if play:
 				fetch_done = False
 				metadata_fetch_done = False
