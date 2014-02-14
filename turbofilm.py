@@ -90,9 +90,12 @@ def main(argv):
 		logfd = sys.stdout
 
 		if not offlineplay:
-				f = open(config.offline_store)
-				d = pickle.load(f)
-				f.close()
+				try:
+						f = open(config.offline_store)
+						d = pickle.load(f)
+						f.close()
+				except IOError:
+						d = []
 				td = list(d)
 				for e in td:
 						r = watchEpisode(e["eid"])
