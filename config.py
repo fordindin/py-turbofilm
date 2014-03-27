@@ -42,8 +42,8 @@ wrkdir = "%s/turbofilm" % os.getenv("HOME")
 offline_store = os.path.join(wrkdir, "offline.pickle")
 
 socks_enable = False
-socks_ip = "199.231.185.97"
-socks_port = 1080
+socks_ip = "127.0.0.1"
+socks_port = 3555
 #socks_ip = "127.0.0.1"
 #socks_port = 9050
 #myresolver="resolv.conf"

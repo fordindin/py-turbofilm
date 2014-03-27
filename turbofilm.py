@@ -141,7 +141,7 @@ def main(argv):
 												kwargs={"silent":True, "queue" : fetch_queue})
 										fetch_th.daemon = True
 										fetch_th.start()
-										time.sleep(config.wait_time*10)
+										#time.sleep(config.wait_time*10)
 
 						if not fetch_queue.empty():
 								fetch_done = fetch_queue.get()
