@@ -29,12 +29,7 @@ import pickle
 #sdata_RE = config.sdata_RE
 
 def usage(selfname):
-		print """Usage:
-\t%s unseen
-\t\tor
-\t%s [-lq] SeriesName
-\t\tor
-\t%s [-lq] SeriesName SeasonNumber EpisodeNumber\n""" % tuple([os.path.basename(selfname)]*4)
+		print """Usage:"""
 		sys.exit(1)
 
 def main(argv):
@@ -59,7 +54,12 @@ def main(argv):
 				playargs.pop(0)
 		if "offline" in argv:
 				offline=True
-				argv.pop(argv.index("offline"))
+				offindex = argv.index("offline")
+				offnum = 0
+				if len(argv) > 3:
+						offnum = argv[offindex+1]
+						argv.pop(offindex)
+				argv.pop(offindex)
 		if "offlineplay" in argv:
 				offlineplay=True
 				playindex=argv.index("offlineplay")
@@ -168,11 +168,14 @@ def main(argv):
 
 		elif offline:
 				offset = 0
-				while True:
+				while offnum > offset or offnum == 0:
 						metadata, file_base = get_metadata(t_name, quality, offset=offset)
 						print "Fetching for offline: \n%s Season %s Episode %s" % (t_name,
 								metadata["season"], metadata["number"])
-						fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
+						try:
+								fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
+						except KeyError:
+								print "Subtitles not found"
 						pfetcher(metadata, file_base, quality)
 						offset += 1
 						#print t_name, metadata["season"], metadata["number"]
