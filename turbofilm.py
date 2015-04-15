@@ -35,14 +35,21 @@ def usage(selfname):
 def main(argv):
 		if not os.path.isdir(config.wrkdir): os.mkdir(config.wrkdir)
 		os.chdir(config.wrkdir)
-		quality="hq"
+		quality=config.quality
 		playargs=[]
 		play=False
 		offline=False
 		offlineplay=False
+		proxy=False
 		if "-lq" in argv:
 				quality = "default"
 				argv.pop(argv.index("-lq"))
+		if "-hq" in argv:
+				quality = "hq"
+				argv.pop(argv.index("-hq"))
+		if "-proxy" in argv:
+				proxy = True
+				argv.pop(argv.index("-proxy"))
 		if len(argv) > 1 and argv[1] == 'unseen':
 				print listunseen()
 				sys.exit(0)
@@ -138,7 +145,7 @@ def main(argv):
 								if metadata_fetch_done:
 										fetch_th = threading.Thread(target=pfetcher, args=(metadata, file_base,
 												quality),
-												kwargs={"silent":True, "queue" : fetch_queue})
+												kwargs={"silent":False, "queue" : fetch_queue})
 										fetch_th.daemon = True
 										fetch_th.start()
 										#time.sleep(config.wait_time*10)
