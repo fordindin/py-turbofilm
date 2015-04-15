@@ -7,6 +7,7 @@ from cdn_url import cdn_url
 import config
 import urllib2
 
+
 def fetcher(metadata, iasid, file_base, quality,  silent=False):
 		sts = 1
 		trycount = 0
@@ -69,13 +70,12 @@ def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
 				if queue: queue.put(True)
 				return True
 		f = open(fpath, "a")
-		req = urllib2.Request(
-								cdn_url(metadata["iasid"],
+		u = cdn_url(metadata["iasid"],
 										metadata["eid"],
 										metadata["sources2"][quality],
 										0,
 										"en")
-								)
+		req = urllib2.Request(u)
 		req.headers['Range'] = 'bytes=%s-%s' % (size, metadata["sizes"][quality])
 		r = urllib2.urlopen(req)
 
