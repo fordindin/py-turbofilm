@@ -34,6 +34,9 @@ def fetch_sub(infile, srt_location="/Users/dindin/tmp/lastflash.srt"):
 
 		data = unicode(f.read(), errors='ignore') #.decode("utf-8-sig").strip()
 		#print type(data)
+		if data == "":
+				srt.close()
+				return
 		dom = xml.dom.minidom.parseString(data)
 		for e in dom.getElementsByTagName("subtitle"):
 				data = ""
