@@ -5,15 +5,21 @@ import urllib, cookielib
 import httplib
 import os, re, time
 import config
+import ssl
+import sys
+
 import socket
 import socks
 if config.socks_enable:
 		socks.setdefaultproxy(socks.PROXY_TYPE_SOCKS5, config.socks_ip,
 						config.socks_port)
 		socket.socket = socks.socksocket
-import urllib2
-import ssl
-import sys
+		import urllib2
+else:
+		import socket
+		import socks
+		import urllib2
+
 
 #from socksipyhandler import SocksiPyHandler
 
