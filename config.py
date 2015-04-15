@@ -19,12 +19,15 @@ login = "dindin@dindin.ru"
 
 auth_url="https://turbik.tv/Signin"
 
-headers =  { 'User-Agent' : "Mozilla/5.0 compatible pure-python Turbofilm.tv client" }
+#headers =  { 'User-Agent' : "Mozilla/5.0 compatible pure-python Turbofilm.tv client" }
+headers =  { 'User-Agent' : "Mozilla/5.0 compatible" }
 
 cookie_path = os.path.expanduser("~/.turbik.tv.cookie")
 
 cdn_base_uri = "https://cdn.turbik.tv/"
 cdn_authkey = "A2DC51DE0F8BC1E9"
+
+quality="default"
 
 max_fetch_retry = 5
 
@@ -41,7 +44,8 @@ wrkdir = "%s/turbofilm" % os.getenv("HOME")
 
 offline_store = os.path.join(wrkdir, "offline.pickle")
 
-socks_enable = True
+socks_enable = False
+#socks_enable = True
 #socks_ip = "127.0.0.1"
 #socks_port = 3555
 socks_ip = "127.0.0.1"
