@@ -8,6 +8,7 @@ import urllib, urllib2, cookielib, getpass
 
 from TurboAuth import TurboAuth
 import config
+import ssl
 
 
 p = TurboAuth(config.login)

@@ -125,8 +125,8 @@ def main(argv):
 						if not metadata_fetch_done:
 								try:
 										metadata, file_base = get_metadata(t_name, quality)
-										metadata_fetch_done = True
 										quality = metadata["fetched_quality"]
+										metadata_fetch_done = True
 										print "Got metadata" # metadata
 								except NoMoreSeries:
 										print "No more series"
@@ -164,7 +164,7 @@ def main(argv):
 										metadata_fetch_done = False
 										continue
 
-						if not play_th.is_alive():
+						if not play_th.is_alive() and os.path.exists(file_base+".mp4") and os.stat(file_base+".mp4").st_size > 0:
 								play_th = threading.Thread(target=turboplay.mplay, args=(playargs,),
 												kwargs={"latest": file_base+".mp4",
 														"queue":play_queue})

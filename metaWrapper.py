@@ -8,7 +8,7 @@ import GetPage
 from MyHTMLParser import MetaHTMLParser
 from lastunseen import get_series_ssn
 from cdn_url import ssn_url
-from wierd_b64_decode import w_base64_decode as wb64
+from weird_b64_decode import w_base64_decode as wb64
 import xml2obj
 import pickle
 

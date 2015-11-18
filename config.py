@@ -3,7 +3,6 @@
 
 import re
 import os
-
 proto = "https:"
 
 
@@ -52,3 +51,7 @@ socks_ip = "127.0.0.1"
 socks_port = 9050
 #myresolver="resolv.conf"
 myresolver=False
+
+ignore_ssl=False
+ignore_ssl_certs=True
+

@@ -37,15 +37,25 @@ cj = config.cookie_path
 
 class TurboAuth:
 		def __init__(self, login, password=None):
+				openers_list = []
 				self.cookie_jar = cookielib.LWPCookieJar(filename=cj)
 				if os.path.isfile(cj): self.cookie_jar.load(cj)
 				# clear expired and session cookies
 				self.cookie_jar.clear_expired_cookies()
 				self.cookie_jar.clear_session_cookies()
+				cookie_opener = urllib2.HTTPCookieProcessor(self.cookie_jar)
+				openers_list.append(cookie_opener)
 				# install cookies
-				openers_list = []
 
-				openers_list.append(urllib2.HTTPCookieProcessor(self.cookie_jar))
+				if config.ignore_ssl_certs:
+						context = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
+						context.options |= ssl.OP_NO_SSLv2
+						context.options |= ssl.OP_NO_SSLv3
+						context.check_hostname = False
+						context.verify_mode = ssl.CERT_NONE
+						https_opener = urllib2.HTTPSHandler(context=context)
+						openers_list.append(https_opener)
+
 				opener=urllib2.build_opener(*openers_list)
 				urllib2.install_opener(opener)
 				self.login = login

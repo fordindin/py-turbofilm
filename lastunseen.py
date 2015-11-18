@@ -4,6 +4,7 @@ import GetPage
 from MyHTMLParser import UnseenHTMLParser
 import re
 import config
+import os
 
 class NoMoreSeries(Exception):
 		pass
@@ -49,7 +50,11 @@ def listunseen(retlist=False):
 					prefix = ">="
 			else: prefix = "=="
 			retstr+=prefix+" %d\t%s\n" % e
-	retstr += "\n"+"-"*20 + "\n\t%s\n" % parser.get_unseen_text()
+	for e in unseen_list:
+			try:
+					os.mkdir(os.path.join(config.wrkdir,e[1]))
+			except: pass
+	retstr+= "\n"+"-"*20 + "\n\t%s\n" % parser.get_unseen_text()
 	return retstr
 
 if __name__ == '__main__':

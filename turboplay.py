@@ -99,8 +99,8 @@ def mplay(argv, latest=None, queue=None, t_name=None, offline=None):
 								try:
 										os.remove(os.path.splitext(latest)[0]+e)
 								except OSError: pass
+						if queue: queue.put({"cleaned_up":True})
 		if queue: queue.put({"pos":float(quit_position[0])})
-		if queue: queue.put({"cleaned_up":True})
 		tee.stdin.close()
 		return float(quit_position[0])
 
