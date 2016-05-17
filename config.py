@@ -3,8 +3,10 @@
 
 import re
 import os
+import urllib
 proto = "https:"
 
+debug=False
 
 turbofilm_base = 'https://turbik.tv'
 
@@ -12,7 +14,10 @@ proto_RE = re.compile("(http:|ftp:|https).*")
 
 srt_urlRE=re.compile('https://(?:.*)/([0-9a-f]{32}).*')
 
-sub_base="http://sub.turbik.tv/en/"
+
+sub_lang="en"
+#sub_lang="ru"
+sub_base=urllib.basejoin("http://sub.turbik.tv/", sub_lang)
 
 login = "dindin@dindin.ru"
 
@@ -28,7 +33,7 @@ cdn_authkey = "A2DC51DE0F8BC1E9"
 
 quality="default"
 
-max_fetch_retry = 5
+max_fetch_retry = 12
 
 wait_time = 1
 

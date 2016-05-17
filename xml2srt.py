@@ -21,13 +21,12 @@ def main(argv):
 		infile = argv[1]
 		srt_match = config.srt_urlRE.match(infile)
 		if srt_match:
-				infile = config.sub_base + srt_match.groups()[0]
+				infile = config.sub_base + "/" + srt_match.groups()[0]
 		fetch_sub(infile)
 
 def fetch_sub(infile, srt_location="/Users/dindin/tmp/lastflash.srt"):
 		if not config.proto_RE.match(infile):
 				infile = config.proto + infile
-		#print infile
 		f = urllib2.urlopen(infile)
 		srt = file(srt_location, "w")
 		counter = 0

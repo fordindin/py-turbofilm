@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from metaWrapper import unwatchEpisode
-eid=2427
+import sys,json
+
+eid = json.load(sys.argv[1])["eid"]
 
 unwatchEpisode(eid)

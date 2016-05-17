@@ -49,44 +49,57 @@ def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
 		#print ""
 		global gdict
 		gdict={}
-		gdict['r_speed'] = 0
+		gdict['relative_speed'] = 0
 		gdict['start_time'] = time.time()
 		gdict['current_time'] = time.time()
 		gdict['previous_time'] = time.time()
 		gdict['previous_sec'] = 0
-		w_template="% 6d seconds fetched % 6d seconds total (% 3d%%) % 4d spent % 5d sec % 7s"
+
 		def pprint(metadata):
+				w_template="% 6d seconds fetched % 6d seconds total (% 3d%%) % 4d spent % 5d sec % 7s"
 				if not silent:
 						global gdict
 						gdict['previous_time'] = gdict['current_time']
 						gdict['current_time'] = time.time()
 						t_time = gdict['current_time'] - gdict['start_time']
+						this_session_fetched_sec = float(size - initial_size)/metadata["bitrate"]
+						gdict['prevous_sec'] = this_session_fetched_sec
+						total_sec = float(size)/metadata["bitrate"]
+						delta_time = gdict['current_time'] - gdict['start_time']
+
 						sys.stdout.write("\b"*len(w_template % (0,0,0,0,0," "*7)))
-						this_session_sec = float(size - initial_size)/metadata["bitrate"]
-						this_probe_sec = this_session_sec - gdict['previous_sec']
-						gdict['prevous_sec'] = this_session_sec
-						sec = float(size)/metadata["bitrate"]
-						delta = gdict['current_time'] - gdict['previous_time']
-						if int(round(delta)) != 0:
-								gdict['r_speed']= gdict['prevous_sec']/delta
-						if gdict['r_speed'] > 0:
+
+						gdict['relative_speed'] = this_session_fetched_sec - delta_time
+
+						if gdict['relative_speed'] > 0:
 								smod = "ahead"
-								out = gdict['r_speed']
-						elif gdict['r_speed'] < 0:
+								out = gdict['relative_speed']
+						elif gdict['relative_speed'] < 0:
 								smod = "behind"
-								out = -gdict['r_speed']
-						elif gdict['r_speed'] == 0:
+								out = -gdict['relative_speed']
+						elif gdict['relative_speed'] == 0:
 								smod = " "
-								out = gdict['r_speed']
+								out = gdict['relative_speed']
+
 						sys.stdout.write(w_template % (
-								int(sec),
+								int(total_sec),
 								int(metadata["duration"]),
-								int(float(sec)/float(metadata["duration"])*100),
+								int(float(total_sec)/float(metadata["duration"])*100),
 								int(t_time),
 								int(out),
 								smod,
 								))
 						sys.stdout.flush()
+						if os.getenv("TMUX"):
+								w_template="\033k%s\033\\" % w_template
+								sys.stdout.write(w_template % (
+										int(total_sec),
+										int(metadata["duration"]),
+										int(float(total_sec)/float(metadata["duration"])*100),
+										int(t_time),
+										int(out),
+										smod,
+										))
 
 		fpath = file_base+".mp4"
 		initial_size = None
@@ -114,15 +127,20 @@ def pfetcher(metadata, file_base, quality, silent=False, bufsize=524288,
 				try:
 						trycount += 1
 						r = urllib2.urlopen(req)
+						break
 				except (urllib2.HTTPError,urllib2.URLError) as ue:
 						if ue.__class__.__name__ == 'URLError':
 								print "URL error on URL: "+u
+								print ue.args
 						if ue.__class__.__name__ == 'HTTPError':
 								print "HTTP error on URL: "+u
-								print u
+								print ue.args
 						#if ue.code == 404:
 						continue
 
+		if trycount >= config.max_fetch_retry:
+				print "Reached: config.max_fetch_retry=%s" % config.max_fetch_retry
+				sys.exit(1)
 		buf = r.read(bufsize)
 		sec = float(size)/metadata["bitrate"]
 		#if outdata:

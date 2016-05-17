@@ -53,6 +53,10 @@ def main(argv):
 		if len(argv) > 1 and argv[1] == 'unseen':
 				print listunseen()
 				sys.exit(0)
+		if "-sub_lang" in argv:
+				ix = argv.index("-sub_lang")
+				argv.pop(ix)
+				config.sub_lang = argv.pop(ix)
 		if "play" in argv:
 				play=True
 				playindex=argv.index("play")
@@ -73,6 +77,21 @@ def main(argv):
 				for i in range(playindex, len(argv)):
 						playargs.append(argv.pop(playindex))
 				playargs.pop(0)
+
+		if "viewmap" in argv:
+				from viewmap import viewmap
+				viewmap()
+				sys.exit(0)
+
+		if "fullunseen" in argv:
+				import viewmap
+				viewmap.listunseen()
+				sys.exit(0)
+
+		if "compactunseen" in argv:
+				for e in listunseen(retlist=True):
+						print e[1]
+				sys.exit(0)
 
 		if len(argv) == 1:
 				turboplay.mplay(playargs)
@@ -119,8 +138,9 @@ def main(argv):
 				tmpfilename = None
 
 				while True:
+						"""
 						if play_th.is_alive() and mplayer_pid and tmpfilename:
-								hangmon(tmpfilename, mplayer_pid)
+								hangmon(tmpfilename, mplayer_pid) """
 
 						if not metadata_fetch_done:
 								try:
@@ -135,7 +155,7 @@ def main(argv):
 						if not sub_fetch_done:
 								try:
 										if metadata_fetch_done:
-												fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
+												fetch_sub(metadata["subtitles"]["sources"][config.sub_lang], file_base+".srt")
 												print "Got subtitles"
 								except KeyError:
 										print "Subtitles not found"
@@ -180,7 +200,7 @@ def main(argv):
 						print "Fetching for offline: \n%s Season %s Episode %s" % (t_name,
 								metadata["season"], metadata["number"])
 						try:
-								fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
+								fetch_sub(metadata["subtitles"]["sources"][config.sub_lang], file_base+".srt")
 						except KeyError:
 								print "Subtitles not found"
 						pfetcher(metadata, file_base, quality)
@@ -195,7 +215,7 @@ def main(argv):
 				print "Got metadata" # metadata
 
 				try:
-						fetch_sub(metadata["subtitles"]["sources"]["en"], file_base+".srt")
+						fetch_sub(metadata["subtitles"]["sources"][config.sub_lang], file_base+".srt")
 						print "Got subtitles"
 				except KeyError:
 						print "Subtitles not found"

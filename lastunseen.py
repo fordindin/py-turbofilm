@@ -25,6 +25,17 @@ def lastunseen(seriesName):
 			if re.match('.*\/%s\/.*' % seriesName, u):
 					return config.turbofilm_base + u
 
+def lastunseen_ssn(seriesName):
+	parser = UnseenHTMLParser()
+	page = GetPage.getpage(config.series_page)["page"]
+	parser.feed(page)
+	for u in parser.get_unseen():
+			if re.match('.*\/%s\/.*' % seriesName, u):
+					m =  re.match("/Watch/%s/Season([0-9]+)/Episode([0-9]+)$" % seriesName, u).groups()
+					m = map(lambda a: int(a), m)
+					m.insert(0, seriesName)
+					return m
+
 def listunseen(retlist=False):
 	unseen = {}
 	unseen_list = []
@@ -56,7 +67,4 @@ def listunseen(retlist=False):
 			except: pass
 	retstr+= "\n"+"-"*20 + "\n\t%s\n" % parser.get_unseen_text()
 	return retstr
-
-if __name__ == '__main__':
-		pass
 

@@ -21,7 +21,7 @@ def auth(login):
 def getpage(url, data={}, headers={}):
 	data = urllib.urlencode(data)
 	auth(config.login)
-	req = urllib2.urlopen(url)
+	#req = urllib2.urlopen(url)
 	req = urllib2.Request(url, data, headers)
 	response = urllib2.urlopen(req)
 	return {"page": response.read()}
